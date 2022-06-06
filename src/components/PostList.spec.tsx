@@ -1,12 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import renderer from "react-test-renderer";
 
-import App from "./App";
-import { PostQuery } from "./models";
-import { useGetPosts } from "./services";
+import { PostQuery } from "../models";
+import { useGetPosts } from "../services";
+import PostList from "./PostList";
 
-jest.mock("./services/posts");
+jest.mock("../services/posts");
 
-test("renders posts", () => {
+it("renders post list correctly", () => {
   const query: PostQuery = {
     data: [
       {
@@ -23,16 +23,12 @@ test("renders posts", () => {
       },
     ],
     loading: false,
+    error: undefined,
   };
 
   const hook = useGetPosts as jest.Mock;
   hook.mockReturnValue(query);
 
-  render(<App />);
-
-  const posts = screen.getAllByText(/john/i);
-  expect(posts.length).toBe(2);
-  posts.forEach((post) => {
-    expect(post).toBeInTheDocument();
-  });
+  const tree = renderer.create(<PostList />).toJSON();
+  expect(tree).toMatchSnapshot();
 });
